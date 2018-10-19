@@ -31,18 +31,14 @@ class HubSpotCompaniesController extends Controller
     public function show($company)
     {
         $response = array_filter($this->getAllCompanies(),function ($item) use ($company){
-            if(Str::contains(mb_strtolower($item['company'],'UTF-8'),mb_strtolower($company,'UTF-8'))){
-                return mb_strtolower($item['company'],'UTF-8') == mb_strtolower($company,'UTF-8');
-            }else{
-                return mb_strtolower($item['company'],'UTF-8') == mb_strtolower($company,'UTF-8');
-            }
+            return mb_strtolower($item['company'],'UTF-8') == mb_strtolower($company,'UTF-8');
         });
 
-        if(empty($response) || is_null($response)){
-            return response()->json($response,204)
+        if(!empty($response) || !is_null($response) || count($response) != 0){
+            return response()->json($response,200)
                 ->header('Content-Type','json');
         }else{
-            return response()->json($response,200)
+            return response()->json('No data found',204)
                 ->header('Content-Type','json');
         }
     }
@@ -54,10 +50,15 @@ class HubSpotCompaniesController extends Controller
     {
         $arrayCompanies = array();
         $response = $this->hubspot->companies()->all([
-            'properties'  => ['name']
+            'properties'  => ['name','phone']
         ]);
+        //return $response->companies;
         foreach ($response->companies as $company) {
-            $arrayCompanies[] = ['company_id'=>$company->companyId,'company' => $company->properties->name->value];
+            $arrayCompanies[] = [
+                'company_id'=>$company->companyId,
+                'company' => $company->properties->name->value,
+                'phone' => isset($company->properties->phone)? $company->properties->phone->value:''
+            ];
         }
         return $arrayCompanies;
     }
