@@ -22,20 +22,33 @@ class HubSpotCompaniesController extends Controller
         $this->hubspot = $hubSpot;
     }
 
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         return response()->json($this->getAllCompanies(),200)
             ->header('Content-Type','json');
     }
 
+    /**
+     * @param $company
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show($company)
     {
         $response = array_filter($this->getAllCompanies(),function ($item) use ($company){
             return mb_strtolower($item['company'],'UTF-8') == mb_strtolower($company,'UTF-8');
         });
 
-        if(!empty($response) || !is_null($response) || count($response) != 0){
-            return response()->json($response,200)
+        if(isset($response["1"])){
+            $data = $response["1"];
+        }else{
+            $data = $response[0];
+        }
+
+        if(!empty($data) || !is_null($data) || count($data) != 0){
+            return response()->json($data,200)
                 ->header('Content-Type','json');
         }else{
             return response()->json('No data found',204)
@@ -45,6 +58,9 @@ class HubSpotCompaniesController extends Controller
 
     /**
      * PRIVATE FUNCTIONS
+     */
+    /**
+     * @return array
      */
     private function getAllCompanies()
     {
