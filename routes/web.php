@@ -15,5 +15,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'companies'], function () use ($router) {
         $router->get('/all', 'HubSpotCompaniesController@index');
         $router->get('/{company}', 'HubSpotCompaniesController@show');
+        $router->get('/contacts/{id}', 'HubSpotCompaniesController@contacts');
     });
 });

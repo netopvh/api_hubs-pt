@@ -56,6 +56,24 @@ class HubSpotCompaniesController extends Controller
         }
     }
 
+    public function contacts($id)
+    {
+        $contactArray = array();
+        $response = $this->hubspot->contacts()->search($id,[
+            'property'  => ['firstname','lastname','email'],
+        ])->getData()->contacts;
+
+        foreach ($response as $item) {
+            $contactArray[] = [
+                'name' => $item->properties->firstname->value . ' ' . $item->properties->lastname->value,
+                'email' => $item->properties->email->value,
+            ];
+        }
+
+        return response()->json($contactArray,200)
+            ->header('Content-Type','json');
+    }
+
     /**
      * PRIVATE FUNCTIONS
      */
