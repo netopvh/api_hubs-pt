@@ -58,17 +58,21 @@ class HubSpotCompaniesController extends Controller
 
     public function contacts($id)
     {
-        
+
         $response = $this->hubspot->contacts()->search($id,[
             'property'  => ['firstname','lastname','email'],
         ])->getData()->contacts;
 
-        $contactArray = [
-            'name' => $response[0]->properties->firstname->value . ' ' . $response[0]->properties->lastname->value,
-            'email' => $response[0]->properties->email->value,
-        ];
+        if(count($response) >= 1){
+            $contactArray = [
+                'name' => $response[0]->properties->firstname->value . ' ' . $response[0]->properties->lastname->value,
+                'email' => $response[0]->properties->email->value,
+            ];
 
-        return response()->json($contactArray,200)
+            return response()->json($contactArray,200)
+                ->header('Content-Type','json');
+        }
+        return response()->json('No data found',204)
             ->header('Content-Type','json');
     }
 
